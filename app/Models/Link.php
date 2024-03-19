@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,7 +11,7 @@ class Link extends Model
     use HasFactory;
 
     protected $fillable = [
-        'full_url', 'shortened_url', 'clicks',
+        'full_url', 'shortened_url', 'clicks', 'user_id',
     ];
 
 
@@ -22,6 +23,11 @@ class Link extends Model
     public function formatFull(): string
     {
         return str_starts_with($this->full_url, 'http') ? $this->full_url : 'https://'.$this->full_url;
+    }
+
+    public function scopeSlug(Builder $query, string $slug): Builder
+    {
+        return $query->where('shortened_url', $slug);
     }
 
     public static function shorten(string $url): string
