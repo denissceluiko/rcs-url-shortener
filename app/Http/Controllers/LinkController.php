@@ -52,13 +52,12 @@ class LinkController extends Controller
             ],
         ]);
 
-            $existing = Link::where('full_url', $request->link)->first();
+        $existing = Link::where('full_url', $request->link)->first();
 
         if (!$request->get('short')) {
             // Check if link is natively shortened
             if ($existing && $existing->shortened_url == Link::shorten($request->link)) {
-                $request->session()->flash('status', $existing->formatShortened());
-                return redirect()->route('link.index');
+                return redirect()->route('link.index')->with('status', $existing);
             }
         }
 
@@ -70,9 +69,7 @@ class LinkController extends Controller
             'user_id' => Auth::user()?->id,
         ]);
 
-
-        $request->session()->flash('status', $link->formatShortened());
-        return redirect()->route('link.index');
+        return redirect()->route('link.index')->with('status', $link);
     }
 
     /**
@@ -103,7 +100,7 @@ class LinkController extends Controller
      */
     public function edit(string $slug)
     {
-        $link = Link::slug($slug)->first();
+        $link = Link::slugOrFail($slug);
 
         if ($link->user_id != Auth::user()->id) {
             return back();
@@ -115,7 +112,7 @@ class LinkController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
         $request->validate([
             'id' => 'required|integer',
@@ -157,5 +154,31 @@ class LinkController extends Controller
         $link->delete();
 
         return redirect('/');
+    }
+
+    public function qr(string $slug)
+    {
+        $link = Link::slugOrFail($slug);
+
+        if (empty($link)) {
+            abort(404);
+        }
+
+        return view('links.qr', compact('link'));
+    }
+
+    public function qrDownload(string $slug)
+    {
+        $link = Link::slugOrFail($slug);
+
+        if (empty($link)) {
+            abort(404);
+        }
+
+        return response()->streamDownload(function() use ($link) {
+            echo $link->QRCode()->getString();
+        }, "qr-code.$link->shortened_url.png", [
+            'Content-Type' => 'image/png',
+        ]);
     }
 }

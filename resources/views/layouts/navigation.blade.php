@@ -25,6 +25,11 @@
                         {{ __('Register') }}
                     </x-nav-link>
                 @endauth
+
+                <div class="hidden sm:-my-px sm:ms-10 sm:flex ml-3">
+                    <x-nav-link :href="route('language', 'lv')" :active="app()->isLocale('lv')">LV</x-nav-link>
+                    <x-nav-link :href="route('language', 'en')" :active="app()->isLocale('en')">EN</x-nav-link>
+                </div>
             </div>
 
             @auth

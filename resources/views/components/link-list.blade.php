@@ -2,7 +2,7 @@
     @foreach ($links as $link)
         <li class="flex justify-between gap-x-1 lg:gap-x-6 py-5">
             <div class="flex min-w-0 gap-x-4">
-                <img class="h-12 w-12 flex-none bg-gray-50" src="{{ $link->QRCode() }}" alt="">
+                <img class="h-12 w-12 flex-none bg-gray-50" src="{{ $link->QRCode()->getDataUri() }}" alt="">
                 <div class="min-w-0 flex-auto">
                     <p class="text-sm font-semibold leading-6 text-gray-900 max-w-40 lg:max-w-lg truncate">{{ $link->full_url}}</p>
                     <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{ url($link->shortened_url) }}</p>
@@ -11,9 +11,9 @@
             <div class="shrink-0 sm:flex sm:flex-row sm:items-end">
                 <div class="sm:flex sm:flex-col content-end">
                     @if(request()->routeIs('dashboard'))
-                        <p class="mt-1 text-s leading-5 text-gray-900"><a href="{{ route('link.edit', $link->shortened_url) }}">Rediģēt</a></p>
+                        <p class="mt-1 text-s leading-5 text-gray-900"><a href="{{ route('link.edit', $link->shortened_url) }}">{{ __('Edit') }}</a></p>
                     @endif
-                    <p class="mt-1 text-xs leading-5 text-gray-500">Clicks: {{ $link->clicks }}</p>
+                    <p class="mt-1 text-xs leading-5 text-gray-500">{{ __('Clicks') }}: {{ $link->clicks }}</p>
                 </div>
                 <div class="sm:flex sm:flex-col">
                     <a href="{{ url($link->shortened_url) }}">

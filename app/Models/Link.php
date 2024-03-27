@@ -2,9 +2,19 @@
 
 namespace App\Models;
 
+use Endroid\QrCode\Builder\Builder as QRBuilder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\Font\NotoSans;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\Result\ResultInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Link extends Model
 {
@@ -14,6 +24,12 @@ class Link extends Model
         'full_url', 'shortened_url', 'clicks', 'user_id',
     ];
 
+    protected function slug(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => $attributes['shortened_url'],
+        );
+    }
 
     public function formatShortened(): string
     {
@@ -25,9 +41,37 @@ class Link extends Model
         return str_starts_with($this->full_url, 'http') ? $this->full_url : 'https://'.$this->full_url;
     }
 
-    public function scopeSlug(Builder $query, string $slug): Builder
+    public static function slugOrFail(string $slug): Link
     {
-        return $query->where('shortened_url', $slug);
+        $link = Link::where('shortened_url', $slug)->first();
+
+        if (is_null($link)) {
+            throw (new ModelNotFoundException())->setModel(
+                Link::class, $slug
+            );
+        }
+
+        return $link;
+    }
+
+    public function QRCode(): ResultInterface
+    {
+        $result = QRBuilder::create()
+            ->writer(new PngWriter())
+            ->writerOptions([])
+            ->data($this->formatShortened())
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(ErrorCorrectionLevel::High)
+            ->size(300)
+            ->margin(10)
+            ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
+            ->labelText($this->formatShortened())
+            ->labelFont(new NotoSans(20))
+            ->labelAlignment(LabelAlignment::Center)
+            ->validateResult(false)
+            ->build();
+
+        return $result;
     }
 
     public static function shorten(string $url): string

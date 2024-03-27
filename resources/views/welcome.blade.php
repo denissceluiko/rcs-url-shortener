@@ -15,7 +15,7 @@
                 </div>
 
                 <div class="flex flex-col pt-3 sm:pt-5 grow">
-                    <h2 class="flex text-xl font-semibold text-black dark:text-white">Saīsinājumi</h2>
+                    <h2 class="flex text-xl font-semibold text-black dark:text-white">{{ __('Shortens') }}</h2>
 
                     <section class="flex">
                         <x-link-list :links="$links"></x-link-list>
