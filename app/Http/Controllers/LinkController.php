@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Link;
+use App\Notifications\LinkClicked;
 use App\Rules\MyURL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 
 class LinkController extends Controller
@@ -91,6 +93,10 @@ class LinkController extends Controller
         $link->update([
             'clicks' => $link->clicks+1,
         ]);
+
+        if ($link->author && $link->clicks % 10 == 0) {
+            Notification::send($link->author, new LinkClicked($link));
+        }
 
         return redirect($link->formatFull());
     }

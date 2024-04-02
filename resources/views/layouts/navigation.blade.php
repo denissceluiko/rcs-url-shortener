@@ -17,6 +17,14 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+                <!-- Admin dashboard -->
+                @if(auth()->user()->isAdmin())
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                        {{ __('Admin dashboard') }}
+                    </x-nav-link>
+                </div>
+                @endif
                 @else
                     <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
                         {{ __('Login') }}
@@ -25,16 +33,16 @@
                         {{ __('Register') }}
                     </x-nav-link>
                 @endauth
+            </div>
 
+
+            <!-- Settings Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <div class="hidden sm:-my-px sm:ms-10 sm:flex ml-3">
                     <x-nav-link :href="route('language', 'lv')" :active="app()->isLocale('lv')">LV</x-nav-link>
                     <x-nav-link :href="route('language', 'en')" :active="app()->isLocale('en')">EN</x-nav-link>
                 </div>
-            </div>
-
-            @auth
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -65,8 +73,8 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+                @endauth
             </div>
-            @endauth
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -87,6 +95,12 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <!-- Admin dashboard -->
+            @if(auth()->user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    {{ __('Admin dashboard') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

@@ -7,7 +7,7 @@
 
 
     <div class="max-w-7xl mx-auto">
-        <x-link-list :links="$links"></x-link-list>
+        <x-admin-link-list :links="$links"></x-admin-link-list>
     </div>
     </div>
 
