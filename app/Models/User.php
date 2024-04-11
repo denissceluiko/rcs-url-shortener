@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'avatar_path',
     ];
 
     /**
@@ -50,6 +52,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function avatar(): string
+    {
+        return !empty($this->avatar_path) ? asset('storage/'.$this->avatar_path) : 'https://ui-avatars.com/api/?name='. urlencode($this->name) .'&color=FFFFFF&background=09090b';
+    }
+
     public function isAdmin(): bool
     {
         return $this->role == UserRole::Administrator;
@@ -58,5 +65,10 @@ class User extends Authenticatable
     public function links(): HasMany
     {
         return $this->hasMany(Link::class);
+    }
+
+    public function scopeAdmins(Builder $query) : Builder
+    {
+        return $query->where('role', UserRole::Administrator);
     }
 }
