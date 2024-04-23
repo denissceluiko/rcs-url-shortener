@@ -2,7 +2,7 @@
     @foreach ($links as $link)
         <li class="flex justify-between gap-x-1 lg:gap-x-6 py-5">
             <div class="flex min-w-0 gap-x-4">
-                <img class="h-12 w-12 flex-none bg-gray-50" src="{{ $link->QRCode()->getDataUri() }}" alt="">
+                <img class="h-12 w-12 flex-none bg-gray-50" src="{{ Storage::disk('images')->url($link->qrcode->path) }}" alt="">
                 <div class="min-w-0 flex-auto">
                     <p class="text-sm font-semibold leading-6 text-gray-900 max-w-40 lg:max-w-lg truncate">{{ $link->full_url}}</p>
                     <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{ url($link->shortened_url) }}</p>

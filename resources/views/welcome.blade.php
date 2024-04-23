@@ -1,7 +1,8 @@
 <x-app-layout>
     <main class="mt-6 max-w-7xl mx-auto">
         <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
-            <x-link-new></x-link-new>
+            <livewire:create-link />
+            {{-- <x-link-new></x-link-new> --}}
 
             <div class="flex flex-col lg:flex-row gap-4 rounded-lg bg-white p-6 col-span-2 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 max-w-7xl">
                 <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">

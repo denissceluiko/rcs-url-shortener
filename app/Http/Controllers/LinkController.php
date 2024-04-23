@@ -71,6 +71,8 @@ class LinkController extends Controller
             'user_id' => Auth::user()?->id,
         ]);
 
+        $link->makeQR();
+
         return redirect()->route('link.index')->with('status', $link);
     }
 

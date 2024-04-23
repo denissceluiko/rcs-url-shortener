@@ -8,14 +8,16 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Label\Font\NotoSans;
 use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\RoundBlockSizeMode;
-use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Writer\Result\ResultInterface;
+use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 class Link extends Model
 {
@@ -60,10 +62,10 @@ class Link extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function QRCode(): ResultInterface
+    public function makeQR(): Image
     {
         $result = QRBuilder::create()
-            ->writer(new PngWriter())
+            ->writer(new SvgWriter())
             ->writerOptions([])
             ->data($this->formatShortened())
             ->encoding(new Encoding('UTF-8'))
@@ -77,11 +79,31 @@ class Link extends Model
             ->validateResult(false)
             ->build();
 
-        return $result;
+        $path = sha1($result->getString()).'.svg';
+
+        Storage::disk('images')->put(
+            $path,
+            $result->getString()
+        );
+
+        return $this->qrcode()->create([
+            'path' => $path,
+        ]);
+    }
+
+    public function qrcode(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     public static function shorten(string $url): string
     {
         return substr(sha1($url), 0, 6);
+    }
+
+    public function delete()
+    {
+        $this->qrcode->delete();
+        parent::delete();
     }
 }
